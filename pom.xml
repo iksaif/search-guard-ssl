@@ -19,11 +19,11 @@
     <parent>
         <groupId>com.floragunn</groupId>
         <artifactId>search-guard-parent</artifactId>
-        <version>6.1-beta6</version>
+        <version>6.20.0</version>
     </parent>
 
     <artifactId>search-guard-ssl</artifactId>
-    <version>6.x-HEAD-SNAPSHOT</version>
+    <version>6.1.1-25.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Search Guard SSL</name>
@@ -40,7 +40,7 @@
     </licenses>
 
     <properties>
-        <elasticsearch.version>6.1.0</elasticsearch.version>
+        <elasticsearch.version>6.1.1</elasticsearch.version>
         <netty-native.version>2.0.5.Final</netty-native.version>
     </properties>
 
