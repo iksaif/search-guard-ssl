@@ -1,10 +1,10 @@
 /*
  * Copyright 2015 floragunn UG (haftungsbeschränkt)
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 
 package com.floragunn.searchguard.ssl.transport;
@@ -26,7 +26,6 @@ import io.netty.handler.codec.DecoderException;
 import io.netty.handler.ssl.NotSslRecordException;
 import io.netty.handler.ssl.SslHandler;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
@@ -58,19 +57,19 @@ public class SearchGuardSSLNettyTransport extends Netty4Transport {
         super(settings, threadPool, networkService, bigArrays, namedWriteableRegistry, circuitBreakerService);
         this.sgks = sgks;
     }
-    
+
     @Override
-    protected void onException(Channel channel, Exception e) throws IOException {
+    protected void onException(Channel channel, Exception e) {
         if (lifecycle.started()) {
-            
+
             Throwable cause = e;
-            
+
             if(e instanceof DecoderException && e != null) {
                 cause = e.getCause();
             }
-            
+
             if(cause instanceof NotSslRecordException) {
-                logger.warn("Someone ({}) speaks transport plaintext instead of ssl, will close the channel", channel.remoteAddress()); 
+                logger.warn("Someone ({}) speaks transport plaintext instead of ssl, will close the channel", channel.remoteAddress());
                 closeChannelWhileHandlingExceptions(channel);
                 return;
             } else if (cause instanceof SSLException) {
@@ -108,15 +107,15 @@ public class SearchGuardSSLNettyTransport extends Netty4Transport {
             final SslHandler sslHandler = new SslHandler(sgks.createServerTransportSSLEngine());
             ch.pipeline().addFirst("ssl_server", sslHandler);
         }
-        
+
         @Override
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
             if(SearchGuardSSLNettyTransport.this.lifecycle.started()) {
-                
+
                 if(cause instanceof DecoderException && cause != null) {
                     cause = cause.getCause();
                 }
-                
+
                 if(cause instanceof NotSslRecordException) {
                     logger.warn("Someone ({}) speaks transport plaintext instead of ssl, will close the channel", ctx.channel().remoteAddress());
                     ctx.channel().close();
@@ -131,7 +130,7 @@ public class SearchGuardSSLNettyTransport extends Netty4Transport {
                     return;
                 }
             }
-            
+
             super.exceptionCaught(ctx, cause);
         }
     }
@@ -141,7 +140,7 @@ public class SearchGuardSSLNettyTransport extends Netty4Transport {
         private final SearchGuardKeyStore sgks;
         private final boolean hostnameVerificationEnabled;
         private final boolean hostnameVerificationResovleHostName;
-        
+
 
         private ClientSSLHandler(final SearchGuardKeyStore sgks, final boolean hostnameVerificationEnabled,
                 final boolean hostnameVerificationResovleHostName) {
@@ -166,7 +165,7 @@ public class SearchGuardSSLNettyTransport extends Netty4Transport {
                     if(log.isDebugEnabled()) {
                         log.debug("Hostname of peer is {} ({}/{}) with hostnameVerificationResovleHostName: {}", hostname, inetSocketAddress.getHostName(), inetSocketAddress.getHostString(), hostnameVerificationResovleHostName);
                     }
-                    
+
                     engine = sgks.createClientTransportSSLEngine(hostname, inetSocketAddress.getPort());
                 } else {
                     engine = sgks.createClientTransportSSLEngine(null, -1);
@@ -197,15 +196,15 @@ public class SearchGuardSSLNettyTransport extends Netty4Transport {
             ch.pipeline().addFirst("client_ssl_handler", new ClientSSLHandler(sgks, hostnameVerificationEnabled,
                     hostnameVerificationResovleHostName));
         }
-        
+
         @Override
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
             if(SearchGuardSSLNettyTransport.this.lifecycle.started()) {
-                
+
                 if(cause instanceof DecoderException && cause != null) {
                     cause = cause.getCause();
                 }
-                
+
                 if(cause instanceof NotSslRecordException) {
                     logger.warn("Someone ({}) speaks transport plaintext instead of ssl, will close the channel", ctx.channel().remoteAddress());
                     ctx.channel().close();
@@ -220,7 +219,7 @@ public class SearchGuardSSLNettyTransport extends Netty4Transport {
                     return;
                 }
             }
-            
+
             super.exceptionCaught(ctx, cause);
         }
     }
