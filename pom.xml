@@ -16,7 +16,7 @@
 
     <groupId>com.floragunn</groupId>
     <artifactId>search-guard-ssl</artifactId>
-    <version>5.6.x-HEAD-SNAPSHOT</version>
+    <version>5.6.7-23-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Search Guard SSL</name>
@@ -44,7 +44,7 @@
     </licenses>
 
     <properties>
-        <elasticsearch.version>5.6.0</elasticsearch.version>
+        <elasticsearch.version>5.6.7</elasticsearch.version>
         <netty-native.version>2.0.5.Final</netty-native.version>
         <dependency.locations.enabled>false</dependency.locations.enabled>
     </properties>
@@ -105,6 +105,24 @@
             <groupId>org.elasticsearch.plugin</groupId>
             <artifactId>transport-netty4-client</artifactId>
             <version>${elasticsearch.version}</version>
+            <exclusions>
+              <exclusion>
+                <artifactId>jna</artifactId>
+                <groupId>org.elasticsearch</groupId>
+              </exclusion>
+              <exclusion>
+                <artifactId>jts</artifactId>
+                <groupId>com.vividsolutions</groupId>
+              </exclusion>
+              <exclusion>
+                <artifactId>log4j-api</artifactId>
+                <groupId>org.apache.logging.log4j</groupId>
+              </exclusion>
+              <exclusion>
+                <artifactId>spatial4j</artifactId>
+                <groupId>org.locationtech.spatial4j</groupId>
+              </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Only test scoped dependencies hereafter -->
