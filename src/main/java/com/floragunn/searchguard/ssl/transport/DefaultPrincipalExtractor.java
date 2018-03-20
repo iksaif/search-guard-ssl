@@ -31,8 +31,8 @@ public class DefaultPrincipalExtractor implements PrincipalExtractor {
 
     private static final String EMAILADDRESS = "EMAILADDRESS";
     private static final String EMAILADDRESS_KEY = EMAILADDRESS+"=";
-    private static final String mailOID = "1.2.840.113549.1.9.1";
-    private static final int oidTokenLen = mailOID.length()+1;
+    private static final String MAIL_OID = "1.2.840.113549.1.9.1";
+    private static final int MAIL_OID_TOKEN_LEN = MAIL_OID.length()+1;
     protected final Logger log = LogManager.getLogger(this.getClass());
     
     @Override
@@ -46,7 +46,7 @@ public class DefaultPrincipalExtractor implements PrincipalExtractor {
         if (principal != null) {
 
             String retval = principal.getName();            
-            final int indexMailStart = retval.indexOf(mailOID+"=");
+            final int indexMailStart = retval.indexOf(MAIL_OID+"=");
 
             if(indexMailStart > -1) {
                 int mailTokenLen = 13;
@@ -70,11 +70,18 @@ public class DefaultPrincipalExtractor implements PrincipalExtractor {
                     log.error("Cannot find {} token in {}", EMAILADDRESS_KEY, dnString.toUpperCase());
                     return retval;
                 }
-                
-                final String oldMail = retval.substring(indexMailStart+oidTokenLen, retval.indexOf(',', indexMailStart+oidTokenLen));
-                final String newMail = dnString.substring(nmStart+mailTokenLen, dnString.indexOf(',', nmStart+mailTokenLen));
-                retval = retval.replaceFirst(oldMail, newMail);
-                retval = retval.replaceFirst(mailOID, EMAILADDRESS);
+
+                try {
+                    int endindexOld = retval.indexOf(',', indexMailStart+MAIL_OID_TOKEN_LEN);
+                    final String oldMail = endindexOld>-1? retval.substring(indexMailStart+MAIL_OID_TOKEN_LEN, endindexOld):retval.substring(indexMailStart+MAIL_OID_TOKEN_LEN);
+                    int endindexNew = dnString.indexOf(',', nmStart+mailTokenLen);
+                    final String newMail = endindexNew>-1? dnString.substring(nmStart+mailTokenLen, endindexNew):dnString.substring(nmStart+mailTokenLen);
+                    retval = retval.replaceFirst(oldMail, newMail);
+                    retval = retval.replaceFirst(MAIL_OID, EMAILADDRESS);
+                } catch (Exception e) {
+                    log.error("unexpected exception parsing emailaddress "+e,e);
+                    retval = dnString;
+                }                    
             }
 
             return retval;
