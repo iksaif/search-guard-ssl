@@ -20,7 +20,14 @@ package com.floragunn.searchguard.ssl.transport;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import javax.naming.InvalidNameException;
+import javax.naming.ldap.LdapName;
+import javax.naming.ldap.Rdn;
 import javax.security.auth.x500.X500Principal;
 
 import org.apache.logging.log4j.LogManager;
@@ -29,59 +36,44 @@ import org.elasticsearch.SpecialPermission;
 
 public class DefaultPrincipalExtractor implements PrincipalExtractor {
 
-    private static final String EMAILADDRESS = "EMAILADDRESS";
-    private static final String EMAILADDRESS_KEY = EMAILADDRESS+"=";
-    private static final String MAIL_OID = "1.2.840.113549.1.9.1";
-    private static final int MAIL_OID_TOKEN_LEN = MAIL_OID.length()+1;
     protected final Logger log = LogManager.getLogger(this.getClass());
     
     @Override
-    public String extractPrincipal(X509Certificate x509Certificate, Type type) {
+    public String extractPrincipal(final X509Certificate x509Certificate, final Type type) {
         if (x509Certificate == null) {
             return null;
         }
 
-        final X500Principal principal = x509Certificate.getSubjectX500Principal();
+        final SecurityManager sm = System.getSecurityManager();
 
-        if (principal != null) {
-
-            String retval = principal.getName();            
-            final int indexMailStart = retval.indexOf(MAIL_OID+"=");
-
-            if(indexMailStart > -1) {
-                int mailTokenLen = 13;
-                
-                final SecurityManager sm = System.getSecurityManager();
-
-                if (sm != null) {
-                    sm.checkPermission(new SpecialPermission());
-                }
-
-                final String dnString = AccessController.doPrivileged(new PrivilegedAction<String>() {
-                    @SuppressWarnings("restriction")
-                    @Override
-                    public String run() {                        
-                        return sun.security.x509.X500Name.asX500Name(principal).toString();
-                    }
-                });
-                
-                int nmStart = dnString.toUpperCase().indexOf(EMAILADDRESS_KEY);
-                if(nmStart == -1) {
-                    log.error("Cannot find {} token in {}", EMAILADDRESS_KEY, dnString.toUpperCase());
-                    return retval;
-                }
-                
-                final String oldMail = retval.substring(indexMailStart+MAIL_OID_TOKEN_LEN, retval.indexOf(',', indexMailStart+MAIL_OID_TOKEN_LEN));
-                final String newMail = dnString.substring(nmStart+mailTokenLen, dnString.indexOf(',', nmStart+mailTokenLen));
-                retval = retval.replaceFirst(oldMail, newMail);
-                retval = retval.replaceFirst(MAIL_OID, EMAILADDRESS);
-            }
-
-            return retval;
-            
+        if (sm != null) {
+            sm.checkPermission(new SpecialPermission());
         }
 
-        return null;
+        String dnString = AccessController.doPrivileged(new PrivilegedAction<String>() {
+            @Override
+            public String run() {          
+                final X500Principal principal = x509Certificate.getSubjectX500Principal();
+                return principal.toString();
+            }
+        });
+
+        //remove whitespaces
+        try {
+            final LdapName ln = new LdapName(dnString);
+            final List<Rdn> rdns = new ArrayList<>(ln.getRdns());
+            Collections.reverse(rdns);
+            dnString = String.join(",", rdns.stream().map(r->r.toString()).collect(Collectors.toList()));
+        } catch (InvalidNameException e) {
+            log.error("Unable to parse: {}",dnString, e);
+        }
+        
+        
+        if(log.isTraceEnabled()) {
+            log.trace("principal: {}", dnString);
+        }
+        
+        return dnString;
     }
 
 }
