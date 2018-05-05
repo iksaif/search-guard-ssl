@@ -71,7 +71,7 @@ public class SSLTest extends AbstractUnitTest {
         enableHTTPClientSSL = true;
         trustHTTPServerCertificate = true;
         sendHTTPClientCertificate = true;
-        keystore = "unittestspecial1-keystore.jks";
+        keystore = "node-untspec5-keystore.p12";
 
         final Settings settings = Settings.builder().put("searchguard.ssl.transport.enabled", false)
                 .put("searchguard.ssl.http.enabled", true)
