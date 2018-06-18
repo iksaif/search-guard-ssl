@@ -20,7 +20,7 @@
   </parent>
 
   <artifactId>search-guard-ssl</artifactId>
-  <version>6.3-HEAD-SNAPSHOT</version>
+  <version>6.3-25.3</version>
   <packaging>jar</packaging>
 
   <name>Search Guard SSL</name>
