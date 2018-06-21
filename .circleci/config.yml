@@ -5,6 +5,7 @@ jobs:
     docker:
       - image: circleci/openjdk:8-jdk-browsers
     steps:
+      - run: sudo apt-get update && sudo apt-get install libapr1 openssl
       - run:
           name: Versions
           command: 'uname -a;java -version;openssl version'
@@ -17,18 +18,19 @@ jobs:
             - ~/.m2
           key: circleci-sg-{{ checksum "pom.xml" }}
       - run: ./smoketest.sh
-      - run: SG_TEST_OPENSSL_OPT=true mvn -Pcoverage verify
+      - run: SG_TEST_OPENSSL_OPT=false mvn -Pcoverage verify
       - store_test_results:
           path: target/surefire-reports
-      #- store_artifacts:
-      #    path: target/demo-java-spring-0.0.1-SNAPSHOT.jar
       - deploy:
-          name: Maybe Deploy
+          name: Deploy and Sonar (for master)
           command: |
+            mvn deploy -DskipTests -s settings.xml
+            
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              SG_TEST_OPENSSL_OPT=true mvn -Pcoverage sonar:sonar -Dsonar.organization=floragunncom-github -Dsonar.login=$SONAR_LOGIN -Dsonar.host.url=https://sonarcloud.io
-              mvn deploy -DskipTests -s settings.xml
+              SG_TEST_OPENSSL_OPT=false mvn -Pcoverage sonar:sonar -Dsonar.organization=floragunncom-github -Dsonar.login=$SONAR_LOGIN -Dsonar.host.url=https://sonarcloud.io
             fi
+
+
 
 workflows:
   version: 2
