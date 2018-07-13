@@ -18,16 +18,32 @@ jobs:
           key: circleci-sg-{{ checksum "pom.xml" }}
       - run: ./smoketest.sh
       - run: SG_TEST_OPENSSL_OPT=true mvn -Pcoverage verify
-      - run: SG_TEST_OPENSSL_OPT=true mvn -Pcoverage sonar:sonar -Dsonar.organization=floragunncom-github -Dsonar.login=$SONAR_LOGIN -Dsonar.host.url=https://sonarcloud.io
       - store_test_results:
           path: target/surefire-reports
       #- store_artifacts:
       #    path: target/demo-java-spring-0.0.1-SNAPSHOT.jar
       - deploy:
-          name: Maybe Deploy
+          name: Deploy
           command: |
+            
+            mvn deploy -DskipTests -s settings.xml
+          
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              mvn deploy -DskipTests -s settings.xml
+              SG_TEST_OPENSSL_OPT=true mvn -Pcoverage sonar:sonar -Dsonar.organization=floragunncom-github -Dsonar.login=$SONAR_LOGIN -Dsonar.host.url=https://sonarcloud.io
             fi
 
-#logging
+workflows:
+  version: 2
+  commit:
+    jobs:
+      - build
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 1 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - build
