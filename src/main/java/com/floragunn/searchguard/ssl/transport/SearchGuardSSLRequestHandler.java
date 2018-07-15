@@ -33,13 +33,11 @@ import org.elasticsearch.ExceptionsHelper;
 import org.elasticsearch.common.util.concurrent.ThreadContext;
 import org.elasticsearch.tasks.Task;
 import org.elasticsearch.threadpool.ThreadPool;
-import org.elasticsearch.transport.TaskTransportChannel;
-import org.elasticsearch.transport.TcpChannel;
+import org.elasticsearch.transport.DelegatingTransportChannel;
 import org.elasticsearch.transport.TcpTransportChannel;
 import org.elasticsearch.transport.TransportChannel;
 import org.elasticsearch.transport.TransportRequest;
 import org.elasticsearch.transport.TransportRequestHandler;
-import org.elasticsearch.transport.netty4.NettyTcpChannel;
 
 import com.floragunn.searchguard.ssl.SslExceptionHandler;
 import com.floragunn.searchguard.ssl.util.ExceptionUtils;
@@ -94,21 +92,18 @@ implements TransportRequestHandler<T> {
         }
         
         try {
-
-            NettyTcpChannel nettyChannel = null;
-
-            if (channel instanceof TaskTransportChannel) {
-                final TransportChannel inner = ((TaskTransportChannel) channel).getChannel();
-                nettyChannel = (NettyTcpChannel) ((TcpTransportChannel) inner).getChannel();
-            } else
-            if (channel instanceof TcpTransportChannel) {
-                final TcpChannel inner = ((TcpTransportChannel) channel).getChannel();
-                nettyChannel = (NettyTcpChannel) inner;
+            
+            Channel nettyChannel = null;
+            
+            if(channel instanceof DelegatingTransportChannel) {
+                nettyChannel = (Channel) ((TcpTransportChannel<?>)((DelegatingTransportChannel) channel).getChannel()).getChannel();
+            } else if (channel instanceof TcpTransportChannel) {
+                nettyChannel = (Channel) ((TcpTransportChannel<?>) channel).getChannel();
             } else {
-                throw new Exception("Invalid channel of type "+channel.getClass()+ " ("+channel.getChannelType()+")");
+                throw new Exception("Invalid channel of type "+channel.getClass());
             }
             
-            final SslHandler sslhandler = (SslHandler) nettyChannel.getLowLevelChannel().pipeline().get("ssl_server");
+            final SslHandler sslhandler = (SslHandler) nettyChannel.pipeline().get("ssl_server");
 
             if (sslhandler == null) {
                 final String msg = "No ssl handler found (SG 11)";
