@@ -83,18 +83,18 @@ public final class SSLConfigConstants {
     
     public static final String[] getSecureSSLProtocols(Settings settings, boolean http)
     {
-        List<String> configuredProtocols = null;
+        String[] configuredProtocols = null;
         
         if(settings != null) {
             if(http) {
-                configuredProtocols = settings.getAsList(SEARCHGUARD_SSL_HTTP_ENABLED_PROTOCOLS, Collections.emptyList());
+                configuredProtocols = settings.getAsArray(SEARCHGUARD_SSL_HTTP_ENABLED_PROTOCOLS, new String[0]);
             } else {
-                configuredProtocols = settings.getAsList(SEARCHGUARD_SSL_TRANSPORT_ENABLED_PROTOCOLS, Collections.emptyList());
+                configuredProtocols = settings.getAsArray(SEARCHGUARD_SSL_TRANSPORT_ENABLED_PROTOCOLS, new String[0]);
             }
         }
         
-        if(configuredProtocols != null && configuredProtocols.size() > 0) {
-            return configuredProtocols.toArray(new String[0]);
+        if(configuredProtocols != null && configuredProtocols.length > 0) {
+            return configuredProtocols;
         }
         
         return _SECURE_SSL_PROTOCOLS.clone();
@@ -210,18 +210,18 @@ public final class SSLConfigConstants {
     
     public static final List<String> getSecureSSLCiphers(Settings settings, boolean http) {
         
-        List<String> configuredCiphers = null;
+        String[] configuredCiphers = null;
         
         if(settings != null) {
             if(http) {
-                configuredCiphers = settings.getAsList(SEARCHGUARD_SSL_HTTP_ENABLED_CIPHERS, Collections.emptyList());
+                configuredCiphers = settings.getAsArray(SEARCHGUARD_SSL_HTTP_ENABLED_CIPHERS, new String[0]);
             } else {
-                configuredCiphers = settings.getAsList(SEARCHGUARD_SSL_TRANSPORT_ENABLED_CIPHERS, Collections.emptyList());
+                configuredCiphers = settings.getAsArray(SEARCHGUARD_SSL_TRANSPORT_ENABLED_CIPHERS, new String[0]);
             }
         }
         
-        if(configuredCiphers != null && configuredCiphers.size() > 0) {
-            return configuredCiphers;
+        if(configuredCiphers != null && configuredCiphers.length > 0) {
+            return Arrays.asList(configuredCiphers);
         }
 
         return Collections.unmodifiableList(Arrays.asList(_SECURE_SSL_CIPHERS));
