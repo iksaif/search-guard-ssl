@@ -42,11 +42,10 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.util.BigArrays;
 import org.elasticsearch.indices.breaker.CircuitBreakerService;
 import org.elasticsearch.threadpool.ThreadPool;
-import org.elasticsearch.transport.TcpChannel;
 import org.elasticsearch.transport.netty4.Netty4Transport;
 
-import com.floragunn.searchguard.ssl.SslExceptionHandler;
 import com.floragunn.searchguard.ssl.SearchGuardKeyStore;
+import com.floragunn.searchguard.ssl.SslExceptionHandler;
 import com.floragunn.searchguard.ssl.util.SSLConfigConstants;
 
 public class SearchGuardSSLNettyTransport extends Netty4Transport {
@@ -63,9 +62,7 @@ public class SearchGuardSSLNettyTransport extends Netty4Transport {
     }
 
     @Override
-    protected void onException(TcpChannel channel, Exception e) {
-        
-        
+    protected void onException(Channel channel, Exception e) {
         if (lifecycle.started()) {
             
             Throwable cause = e;
@@ -77,16 +74,16 @@ public class SearchGuardSSLNettyTransport extends Netty4Transport {
             errorHandler.logError(cause, false);
             
             if(cause instanceof NotSslRecordException) {
-                logger.warn("Someone ({}) speaks transport plaintext instead of ssl, will close the channel", channel.getLocalAddress());
-                TcpChannel.closeChannel(channel, false);
+                logger.warn("Someone ({}) speaks transport plaintext instead of ssl, will close the channel", channel.remoteAddress());
+                closeChannelWhileHandlingExceptions(channel);
                 return;
             } else if (cause instanceof SSLException) {
                 logger.error("SSL Problem "+cause.getMessage(),cause);
-                TcpChannel.closeChannel(channel, false);
+                closeChannelWhileHandlingExceptions(channel);
                 return;
             } else if (cause instanceof SSLHandshakeException) {
                 logger.error("Problem during handshake "+cause.getMessage());
-                TcpChannel.closeChannel(channel, false);
+                closeChannelWhileHandlingExceptions(channel);
                 return;
             }
         }
