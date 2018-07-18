@@ -20,7 +20,7 @@
   </parent>
 
   <artifactId>search-guard-ssl</artifactId>
-  <version>6.3-HEAD-SNAPSHOT</version>
+  <version>6.3.2-25.3-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>Search Guard SSL</name>
@@ -37,7 +37,7 @@
   </licenses>
 
   <properties>
-    <elasticsearch.version>6.3.0</elasticsearch.version>
+    <elasticsearch.version>6.3.2-SNAPSHOT</elasticsearch.version>
 
     <!-- deps -->
     <netty-native.version>2.0.7.Final</netty-native.version>
