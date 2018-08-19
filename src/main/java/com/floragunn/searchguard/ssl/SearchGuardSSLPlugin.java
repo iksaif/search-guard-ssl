@@ -195,11 +195,12 @@ public class SearchGuardSSLPlugin extends Plugin implements ActionPlugin, Networ
     }
     
     
+    
 
     @Override
     public Map<String, Supplier<HttpServerTransport>> getHttpTransports(Settings settings, ThreadPool threadPool, BigArrays bigArrays,
-            CircuitBreakerService circuitBreakerService, NamedWriteableRegistry namedWriteableRegistry,
-            NamedXContentRegistry xContentRegistry, NetworkService networkService, Dispatcher dispatcher) {
+            PageCacheRecycler pageCacheRecycler, CircuitBreakerService circuitBreakerService, NamedXContentRegistry xContentRegistry,
+            NetworkService networkService, Dispatcher dispatcher) {
         
         final Map<String, Supplier<HttpServerTransport>> httpTransports = new HashMap<String, Supplier<HttpServerTransport>>(1);
         if (!client && httpSSLEnabled) {
@@ -211,6 +212,7 @@ public class SearchGuardSSLPlugin extends Plugin implements ActionPlugin, Networ
             
         }
         return httpTransports;
+
     }
 
     @Override

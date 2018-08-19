@@ -32,6 +32,8 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.util.BigArrays;
 import org.elasticsearch.common.util.concurrent.ThreadContext;
 import org.elasticsearch.common.xcontent.NamedXContentRegistry;
+import org.elasticsearch.http.HttpChannel;
+import org.elasticsearch.http.HttpHandlingSettings;
 import org.elasticsearch.http.netty4.Netty4HttpServerTransport;
 import org.elasticsearch.threadpool.ThreadPool;
 
@@ -41,7 +43,7 @@ import com.floragunn.searchguard.ssl.SearchGuardKeyStore;
 public class SearchGuardSSLNettyHttpServerTransport extends Netty4HttpServerTransport {
 
     private final SearchGuardKeyStore sgks;
-    private final ThreadContext threadContext;
+    //private final ThreadContext threadContext;
     private final SslExceptionHandler errorHandler;
     
     public SearchGuardSSLNettyHttpServerTransport(final Settings settings, final NetworkService networkService, final BigArrays bigArrays,
@@ -49,48 +51,50 @@ public class SearchGuardSSLNettyHttpServerTransport extends Netty4HttpServerTran
             final SslExceptionHandler errorHandler) {
         super(settings, networkService, bigArrays, threadPool, namedXContentRegistry, dispatcher);
         this.sgks = sgks;
-        this.threadContext = threadPool.getThreadContext();
+        //this.threadContext = threadPool.getThreadContext();
         this.errorHandler = errorHandler;
     }
 
     @Override
     public ChannelHandler configureServerChannelHandler() {
-        return new SSLHttpChannelHandler(this, sgks);
+        return new SSLHttpChannelHandler(this, handlingSettings, sgks);
     }
 
     @Override
-    protected final void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+    protected void onException(HttpChannel channel, Exception cause0) {
         if(this.lifecycle.started()) {
             
-            if(cause instanceof DecoderException && cause != null) {
-                cause = cause.getCause();
+            Throwable cause = cause0;
+            
+            if(cause0 instanceof DecoderException && cause0 != null) {
+                cause = cause0.getCause();
             }
             
             errorHandler.logError(cause, true);
             
             if(cause instanceof NotSslRecordException) {
-                logger.warn("Someone ({}) speaks http plaintext instead of ssl, will close the channel", ctx.channel().remoteAddress());
-                ctx.channel().close();
+                logger.warn("Someone ({}) speaks http plaintext instead of ssl, will close the channel", channel.getRemoteAddress());
+                channel.close();
                 return;
             } else if (cause instanceof SSLException) {
                 logger.error("SSL Problem "+cause.getMessage(),cause);
-                ctx.channel().close();
+                channel.close();
                 return;
             } else if (cause instanceof SSLHandshakeException) {
                 logger.error("Problem during handshake "+cause.getMessage());
-                ctx.channel().close();
+                channel.close();
                 return;
             }
             
         }
         
-        super.exceptionCaught(ctx, cause);
+        super.onException(channel, cause0);
     }
 
     protected class SSLHttpChannelHandler extends Netty4HttpServerTransport.HttpChannelHandler {
         
-        protected SSLHttpChannelHandler(Netty4HttpServerTransport transport, final SearchGuardKeyStore sgks) {
-            super(transport, SearchGuardSSLNettyHttpServerTransport.this.detailedErrorsEnabled, SearchGuardSSLNettyHttpServerTransport.this.threadContext);
+        protected SSLHttpChannelHandler(Netty4HttpServerTransport transport, final HttpHandlingSettings handlingSettings, final SearchGuardKeyStore sgks) {
+            super(transport, handlingSettings);
         }
 
         @Override

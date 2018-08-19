@@ -36,4 +36,5 @@ grant {
   
   permission java.net.NetPermission "getNetworkInformation";
   permission java.net.SocketPermission "*", "connect,accept,resolve";
+  permission java.lang.RuntimePermission "setContextClassLoader";
 };

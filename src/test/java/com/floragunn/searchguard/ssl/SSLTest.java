@@ -349,7 +349,10 @@ public class SSLTest extends AbstractUnitTest {
             startES(settings);
             Assert.fail();
         } catch (Exception e1) {
+            e1.printStackTrace();
+            System.out.println("##1 "+e1.toString());
             Throwable e = ExceptionUtils.getRootCause(e1);
+            System.out.println("##2 "+e.toString());
             if(allowOpenSSL) {
                 Assert.assertTrue(e.toString(), e.toString().contains("no cipher match"));
             } else {

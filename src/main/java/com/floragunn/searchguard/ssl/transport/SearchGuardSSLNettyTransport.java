@@ -42,11 +42,11 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.util.BigArrays;
 import org.elasticsearch.indices.breaker.CircuitBreakerService;
 import org.elasticsearch.threadpool.ThreadPool;
-import org.elasticsearch.transport.TcpChannel;
+import org.elasticsearch.transport.TcpServerChannel;
 import org.elasticsearch.transport.netty4.Netty4Transport;
 
-import com.floragunn.searchguard.ssl.SslExceptionHandler;
 import com.floragunn.searchguard.ssl.SearchGuardKeyStore;
+import com.floragunn.searchguard.ssl.SslExceptionHandler;
 import com.floragunn.searchguard.ssl.util.SSLConfigConstants;
 
 public class SearchGuardSSLNettyTransport extends Netty4Transport {
@@ -62,8 +62,17 @@ public class SearchGuardSSLNettyTransport extends Netty4Transport {
         this.errorHandler = errorHandler;
     }
 
+    
+    
     @Override
-    protected void onException(TcpChannel channel, Exception e) {
+    protected void onNonChannelException(Exception exception) {
+        // TODO Auto-generated method stub
+        super.onNonChannelException(exception);
+    }
+
+
+    @Override
+    protected void onServerException(TcpServerChannel channel, Exception e) {
         
         
         if (lifecycle.started()) {
@@ -78,19 +87,19 @@ public class SearchGuardSSLNettyTransport extends Netty4Transport {
             
             if(cause instanceof NotSslRecordException) {
                 logger.warn("Someone ({}) speaks transport plaintext instead of ssl, will close the channel", channel.getLocalAddress());
-                TcpChannel.closeChannel(channel, false);
+                channel.close();
                 return;
             } else if (cause instanceof SSLException) {
                 logger.error("SSL Problem "+cause.getMessage(),cause);
-                TcpChannel.closeChannel(channel, false);
+                channel.close();
                 return;
             } else if (cause instanceof SSLHandshakeException) {
                 logger.error("Problem during handshake "+cause.getMessage());
-                TcpChannel.closeChannel(channel, false);
+                channel.close();
                 return;
             }
         }
-        super.onException(channel, e);
+        super.onServerException(channel, e);
     }
 
     @Override

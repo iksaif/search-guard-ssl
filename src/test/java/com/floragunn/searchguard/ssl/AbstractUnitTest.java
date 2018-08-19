@@ -141,7 +141,7 @@ public abstract class AbstractUnitTest {
                 .put("cluster.name", clustername)
                 .put("path.data", "data/data")
                 .put("path.logs", "data/logs")
-                .put("http.enabled", !dataNode)
+                //.put("http.enabled", !dataNode)
                 .put("cluster.routing.allocation.disk.watermark.high","1mb")
                 .put("cluster.routing.allocation.disk.watermark.low","1mb")
                 .put("cluster.routing.allocation.disk.watermark.flood_stage", "1mb")

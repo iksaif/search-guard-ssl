@@ -26,6 +26,6 @@ public class PluginAwareNode extends Node {
 
     @SafeVarargs
     public PluginAwareNode(final Settings preparedSettings, final Class<? extends Plugin>... plugins) {
-        super(InternalSettingsPreparer.prepareEnvironment(preparedSettings, null), Arrays.asList(plugins));
+        super(InternalSettingsPreparer.prepareEnvironment(preparedSettings), Arrays.asList(plugins));
     }
 }
