@@ -13,36 +13,38 @@
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>com.floragunn</groupId>
-        <artifactId>search-guard-parent</artifactId>
-        <version>6.1-beta6</version>
-    </parent>
+  <parent>
+    <groupId>com.floragunn</groupId>
+    <artifactId>search-guard-parent</artifactId>
+    <version>6.22.0</version>
+  </parent>
 
-    <artifactId>search-guard-ssl</artifactId>
-    <version>6.x-HEAD-SNAPSHOT</version>
-    <packaging>jar</packaging>
+  <artifactId>search-guard-ssl</artifactId>
+  <version>6.1-HEAD-SNAPSHOT</version>
+  <packaging>jar</packaging>
 
-    <name>Search Guard SSL</name>
-    <description>Provides SSL for Elasticsearch 6</description>
-    <url>https://github.com/floragunncom/search-guard-ssl</url>
-    <inceptionYear>2015</inceptionYear>
+  <name>Search Guard SSL</name>
+  <description>Provides SSL for Elasticsearch 6</description>
+  <url>https://github.com/floragunncom/search-guard-ssl</url>
+  <inceptionYear>2015</inceptionYear>
 
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 
-    <properties>
-        <elasticsearch.version>6.1.0</elasticsearch.version>
-        <netty-native.version>2.0.5.Final</netty-native.version>
-    </properties>
+  <properties>
+    <elasticsearch.version>6.1.0</elasticsearch.version>
+    <!-- deps -->
+    <netty-native.version>2.0.5.Final</netty-native.version>
+    <log4j.version>2.9.1</log4j.version>
+  </properties>
 
     <scm>
         <url>https://github.com/floragunncom/search-guard-ssl</url>
@@ -78,7 +80,7 @@
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-            <version>2.9.1</version>
+            <version>${log4j.version}</version>
             <scope>provided</scope>
         </dependency>
 
