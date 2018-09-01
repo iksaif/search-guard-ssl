@@ -4,7 +4,7 @@ jobs:
     working_directory: ~/circleci-sg
     resource_class: xlarge
     docker:
-      - image: circleci/openjdk:11-jdk-browsers
+      - image: circleci/openjdk:10-jdk-browsers
     steps:
       - run:
           name: Versions
@@ -18,7 +18,7 @@ jobs:
             - ~/.m2
           key: circleci-sg-{{ checksum "pom.xml" }}
       #- run: ./smoketest.sh
-      - run: SG_TEST_OPENSSL_OPT=true mvn verify
+      - run: SG_TEST_OPENSSL_OPT=true mvn -Pcoverage verify
       - store_test_results:
           path: target/surefire-reports
       #- store_artifacts:
@@ -33,9 +33,9 @@ jobs:
             # an update to jacoco >= 0.8.3 (when available) should fix it
             # Maybe sonar is also not ready to work with Java 11
             
-            #if [ "${CIRCLE_BRANCH}" == "master" ]; then
-            #  SG_TEST_OPENSSL_OPT=true mvn -Pcoverage sonar:sonar -Dsonar.organization=floragunncom-github -Dsonar.login=$SONAR_LOGIN -Dsonar.host.url=https://sonarcloud.io
-            #fi
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              SG_TEST_OPENSSL_OPT=true mvn -Pcoverage sonar:sonar -Dsonar.organization=floragunncom-github -Dsonar.login=$SONAR_LOGIN -Dsonar.host.url=https://sonarcloud.io
+            fi
 
 workflows:
   version: 2
