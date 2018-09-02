@@ -4,7 +4,7 @@ jobs:
     working_directory: ~/circleci-sg
     resource_class: xlarge
     docker:
-      - image: circleci/openjdk:10-jdk-browsers
+      - image: "circleci/openjdk:${SG_JAVA_BUILD_VERSION:-10}-jdk-browsers"
     steps:
       - run:
           name: Versions
