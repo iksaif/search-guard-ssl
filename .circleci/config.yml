@@ -14,14 +14,14 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - maven-repo-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
-            - maven-repo-v1-{{ .Branch }}-
-            - maven-repo-v1-
-      - run: mvn dependency:go-offline
+            - maven-repo-v2-{{ .Branch }}-{{ checksum "pom.xml" }}
+            - maven-repo-v2-{{ .Branch }}-
+            - maven-repo-v2-
+      - run: mvn -U -Pcoverage dependency:go-offline
       - save_cache:
           paths:
             - ~/.m2
-          key: maven-repo-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
+          key: maven-repo-v2-{{ .Branch }}-{{ checksum "pom.xml" }}
       #- run: ./smoketest.sh
       - run: SG_TEST_OPENSSL_OPT=true mvn -U -Pcoverage verify
       - store_test_results:
@@ -31,6 +31,8 @@ jobs:
           command: |
             
             mvn deploy -U -DskipTests -s settings.xml
+            
+            set +e
             
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
               SG_TEST_OPENSSL_OPT=true mvn -U -Pcoverage sonar:sonar -Dsonar.organization=floragunncom-github -Dsonar.login=$SONAR_LOGIN -Dsonar.host.url=https://sonarcloud.io
