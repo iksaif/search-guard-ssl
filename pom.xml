@@ -40,7 +40,7 @@
     <elasticsearch.version>6.4.0</elasticsearch.version>
 
     <!-- deps -->
-    <netty-native.version>2.0.7.Final</netty-native.version>
+    <netty-native.version>2.0.8.Final</netty-native.version>
     <log4j.version>2.11.1</log4j.version>
   </properties>
 
