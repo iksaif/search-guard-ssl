@@ -83,6 +83,9 @@ public abstract class AbstractUnitTest {
                 + System.getProperty("java.vm.name"));
         System.out.println("Open SSL available: "+OpenSsl.isAvailable());
         System.out.println("Open SSL version: "+OpenSsl.versionString());
+        System.out.println("Open SSL version: "+OpenSsl.availableJavaCipherSuites());
+        System.out.println("Open SSL version: "+OpenSsl.availableOpenSslCipherSuites());
+        
     }
 
     @Rule
