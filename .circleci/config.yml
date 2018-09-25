@@ -6,7 +6,7 @@ jobs:
     docker:
       # Java 11 does currently crash, hopefully solved with GA release
       # So for now we default to Java 10
-      - image: "circleci/openjdk:${SG_JAVA_BUILD_VERSION:-10}-jdk-browsers"
+      - image: "circleci/openjdk:${SG_JAVA_BUILD_VERSION:-11}-jdk-browsers"
     steps:
       - run:
           name: Install and Update
