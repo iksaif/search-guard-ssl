@@ -155,11 +155,11 @@ public class DefaultSearchGuardKeyStore implements SearchGuardKeyStore {
         log.info("TLS Transport Server Provider : {}", sslTransportServerProvider);
         log.info("TLS HTTP Provider             : {}", sslHTTPProvider);
 
-        log.debug("sslTransportClientProvider:{} with ciphers {}", sslTransportClientProvider,
+        log.info("sslTransportClientProvider:{} with ciphers {}", sslTransportClientProvider,
                 getEnabledSSLCiphers(sslTransportClientProvider, false));
-        log.debug("sslTransportServerProvider:{} with ciphers {}", sslTransportServerProvider,
+        log.info("sslTransportServerProvider:{} with ciphers {}", sslTransportServerProvider,
                 getEnabledSSLCiphers(sslTransportServerProvider, false));
-        log.debug("sslHTTPProvider:{} with ciphers {}", sslHTTPProvider, getEnabledSSLCiphers(sslHTTPProvider, true));
+        log.info("sslHTTPProvider:{} with ciphers {}", sslHTTPProvider, getEnabledSSLCiphers(sslHTTPProvider, true));
 
         log.info("Enabled TLS protocols for transport layer : {}",
                 Arrays.toString(getEnabledSSLProtocols(sslTransportServerProvider, false)));
@@ -167,11 +167,11 @@ public class DefaultSearchGuardKeyStore implements SearchGuardKeyStore {
                 Arrays.toString(getEnabledSSLProtocols(sslHTTPProvider, true)));
         
         
-        log.debug("sslTransportClientProvider:{} with protocols {}", sslTransportClientProvider,
+        log.info("sslTransportClientProvider:{} with protocols {}", sslTransportClientProvider,
                 getEnabledSSLProtocols(sslTransportClientProvider, false));
-        log.debug("sslTransportServerProvider:{} with protocols {}", sslTransportServerProvider,
+        log.info("sslTransportServerProvider:{} with protocols {}", sslTransportServerProvider,
                 getEnabledSSLProtocols(sslTransportServerProvider, false));
-        log.debug("sslHTTPProvider:{} with protocols {}", sslHTTPProvider, getEnabledSSLProtocols(sslHTTPProvider, true));
+        log.info("sslHTTPProvider:{} with protocols {}", sslHTTPProvider, getEnabledSSLProtocols(sslHTTPProvider, true));
 
         if (transportSSLEnabled && (getEnabledSSLCiphers(sslTransportClientProvider, false).isEmpty()
                 || getEnabledSSLCiphers(sslTransportServerProvider, false).isEmpty())) {

@@ -18,11 +18,19 @@
 package com.floragunn.searchguard.ssl;
 
 import io.netty.handler.ssl.OpenSsl;
+import io.netty.util.internal.PlatformDependent;
 
 import java.util.HashSet;
 import java.util.Set;
 
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
+import org.elasticsearch.action.admin.cluster.node.info.NodesInfoRequest;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.node.Node;
+import org.elasticsearch.node.PluginAwareNode;
+import org.elasticsearch.transport.Netty4Plugin;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
@@ -164,4 +172,42 @@ public class OpenSSLTest extends SSLTest {
         Assume.assumeTrue(OpenSsl.isAvailable());
         super.testHttpsAndNodeSSLPemEnc();
     }
+
+
+    @Test
+    public void testNodeClientSSLwithOpensslTLSv13() throws Exception {
+        
+        Assume.assumeTrue(OpenSsl.isAvailable());
+    
+        final Settings settings = Settings.builder().put("searchguard.ssl.transport.enabled", true)
+                .put(SSLConfigConstants.SEARCHGUARD_SSL_HTTP_ENABLE_OPENSSL_IF_AVAILABLE, allowOpenSSL)
+                .put(SSLConfigConstants.SEARCHGUARD_SSL_TRANSPORT_ENABLE_OPENSSL_IF_AVAILABLE, allowOpenSSL)
+                .put(SSLConfigConstants.SEARCHGUARD_SSL_TRANSPORT_KEYSTORE_ALIAS, "node-0")
+                .put("searchguard.ssl.transport.keystore_filepath", getAbsoluteFilePathFromClassPath("node-0-keystore.jks"))
+                .put("searchguard.ssl.transport.truststore_filepath", getAbsoluteFilePathFromClassPath("truststore.jks"))
+                .put("searchguard.ssl.transport.enforce_hostname_verification", false)
+                .put("searchguard.ssl.transport.resolve_hostname", false)
+                .putList(SSLConfigConstants.SEARCHGUARD_SSL_TRANSPORT_ENABLED_PROTOCOLS, "TLSv1.3")
+                //.putList(SSLConfigConstants.SEARCHGUARD_SSL_TRANSPORT_ENABLED_CIPHERS, "TLS_AES_128_GCM_SHA256")
+                .build();
+    
+        startES(settings);      
+    
+        final Settings tcSettings = Settings.builder().put("cluster.name", clustername).put("path.home", ".")
+                .put(settings)// -----
+                .build();
+    
+        try (Node node = new PluginAwareNode(tcSettings, Netty4Plugin.class, SearchGuardSSLPlugin.class).start()) {
+            ClusterHealthResponse res = node.client().admin().cluster().health(new ClusterHealthRequest().waitForNodes("4").timeout(TimeValue.timeValueSeconds(5))).actionGet();
+            Assert.assertFalse(res.isTimedOut());
+            Assert.assertEquals(4, res.getNumberOfNodes());
+            Assert.assertEquals(4, node.client().admin().cluster().nodesInfo(new NodesInfoRequest()).actionGet().getNodes().size());
+        }
+    
+        Assert.assertFalse(executeSimpleRequest("_nodes/stats?pretty").contains("\"tx_size_in_bytes\" : 0"));
+        Assert.assertFalse(executeSimpleRequest("_nodes/stats?pretty").contains("\"rx_count\" : 0"));
+        Assert.assertFalse(executeSimpleRequest("_nodes/stats?pretty").contains("\"rx_size_in_bytes\" : 0"));
+        Assert.assertFalse(executeSimpleRequest("_nodes/stats?pretty").contains("\"tx_count\" : 0"));
+    }
+    
 }
