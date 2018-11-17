@@ -19,6 +19,7 @@ package com.floragunn.searchguard.ssl;
 
 import java.net.InetSocketAddress;
 import java.net.SocketException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.security.Security;
@@ -578,8 +579,10 @@ public class SSLTest extends AbstractUnitTest {
         final Settings tcSettings = Settings.builder().put("cluster.name", clustername).put("path.home", ".")
                 .put(settings)// -----
                 .build();
+        
+        Path configPath = null;
 
-        try (Node node = new PluginAwareNode(tcSettings, Netty4Plugin.class, SearchGuardSSLPlugin.class).start()) {
+        try (Node node = new PluginAwareNode(tcSettings, configPath, Netty4Plugin.class, SearchGuardSSLPlugin.class).start()) {
             ClusterHealthResponse res = node.client().admin().cluster().health(new ClusterHealthRequest().waitForNodes("4").timeout(TimeValue.timeValueSeconds(5))).actionGet();
             Assert.assertFalse(res.isTimedOut());
             Assert.assertEquals(4, res.getNumberOfNodes());

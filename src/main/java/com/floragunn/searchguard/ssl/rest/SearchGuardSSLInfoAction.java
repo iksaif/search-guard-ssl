@@ -46,10 +46,12 @@ public class SearchGuardSSLInfoAction extends BaseRestHandler {
     private final SearchGuardKeyStore sgks;
     final PrincipalExtractor principalExtractor;
     private final Path configPath;
+    private final Settings settings;
 
     public SearchGuardSSLInfoAction(final Settings settings, final Path configPath, final RestController controller,
             final SearchGuardKeyStore sgks, final PrincipalExtractor principalExtractor) {
         super(settings);
+        this.settings = settings;
         this.sgks = sgks;
         this.principalExtractor = principalExtractor;
         this.configPath = configPath;

@@ -165,13 +165,15 @@ public abstract class AbstractUnitTest {
     public final void startES(final Settings settings) throws Exception {
 
         FileUtils.deleteDirectory(new File("data"));
+        
+        Path configPath = null;
 
         esNode1 = new PluginAwareNode(getDefaultSettingsBuilder(1, false, true).put(
-                settings == null ? Settings.Builder.EMPTY_SETTINGS : settings).build(), Netty4Plugin.class, SearchGuardSSLPlugin.class);
+                settings == null ? Settings.Builder.EMPTY_SETTINGS : settings).build(), configPath, Netty4Plugin.class, SearchGuardSSLPlugin.class);
         esNode2 = new PluginAwareNode(getDefaultSettingsBuilder(2, true, true).put(
-                settings == null ? Settings.Builder.EMPTY_SETTINGS : settings).build(), Netty4Plugin.class, SearchGuardSSLPlugin.class);
+                settings == null ? Settings.Builder.EMPTY_SETTINGS : settings).build(), configPath, Netty4Plugin.class, SearchGuardSSLPlugin.class);
         esNode3 = new PluginAwareNode(getDefaultSettingsBuilder(3, true, false).put(
-                settings == null ? Settings.Builder.EMPTY_SETTINGS : settings).build(), Netty4Plugin.class, SearchGuardSSLPlugin.class);
+                settings == null ? Settings.Builder.EMPTY_SETTINGS : settings).build(), configPath, Netty4Plugin.class, SearchGuardSSLPlugin.class);
 
         esNode1.start();
         esNode2.start();

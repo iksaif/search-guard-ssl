@@ -17,7 +17,9 @@
 
 package org.elasticsearch.node;
 
+import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.plugins.Plugin;
@@ -25,7 +27,7 @@ import org.elasticsearch.plugins.Plugin;
 public class PluginAwareNode extends Node {
 
     @SafeVarargs
-    public PluginAwareNode(final Settings preparedSettings, final Class<? extends Plugin>... plugins) {
-        super(InternalSettingsPreparer.prepareEnvironment(preparedSettings), Arrays.asList(plugins));
+    public PluginAwareNode(final Settings preparedSettings, Path configPath, final Class<? extends Plugin>... plugins) {
+        super(InternalSettingsPreparer.prepareEnvironment(preparedSettings, Collections.emptyMap(), configPath, () -> System.getenv("HOSTNAME")), Arrays.asList(plugins), true);
     }
 }

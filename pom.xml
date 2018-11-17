@@ -16,7 +16,7 @@
   <parent>
     <groupId>com.floragunn</groupId>
     <artifactId>search-guard-parent</artifactId>
-    <version>6.20.0</version>
+    <version>6.22.1</version>
   </parent>
 
   <artifactId>search-guard-ssl</artifactId>
@@ -37,10 +37,10 @@
   </licenses>
 
   <properties>
-    <elasticsearch.version>7.0.0-alpha1-SNAPSHOT</elasticsearch.version>
+    <elasticsearch.version>7.0.0-alpha1</elasticsearch.version>
 
     <!-- deps -->
-    <netty-native.version>2.0.12.Final</netty-native.version>
+    <netty-native.version>2.0.15.Final</netty-native.version>
     <log4j.version>2.11.1</log4j.version>
   </properties>
   
@@ -48,7 +48,7 @@
     <repository>
       <id>elastic-lucene-snapshots</id>
       <name>Elastic Lucene Snapshots</name>
-      <url>http://s3.amazonaws.com/download.elasticsearch.org/lucenesnapshots/13b9e28f9d</url>
+      <url>http://s3.amazonaws.com/download.elasticsearch.org/lucenesnapshots/6d9c714052</url>
       <releases><enabled>true</enabled></releases>
       <snapshots><enabled>false</enabled></snapshots>
     </repository>
