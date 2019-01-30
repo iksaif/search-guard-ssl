@@ -17,8 +17,6 @@
 
 package com.floragunn.searchguard.ssl.transport;
 
-import io.netty.handler.ssl.SslHandler;
-
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
@@ -43,6 +41,8 @@ import org.elasticsearch.transport.netty4.Netty4TcpChannel;
 import com.floragunn.searchguard.ssl.SslExceptionHandler;
 import com.floragunn.searchguard.ssl.util.ExceptionUtils;
 import com.floragunn.searchguard.ssl.util.SSLRequestHelper;
+
+import io.netty.handler.ssl.SslHandler;
 
 public class SearchGuardSSLRequestHandler<T extends TransportRequest>
 implements TransportRequestHandler<T> {
@@ -93,7 +93,7 @@ implements TransportRequestHandler<T> {
 
             if (channel instanceof TaskTransportChannel) {
                 final TransportChannel inner = ((TaskTransportChannel) channel).getChannel();
-                nettyChannel = (Netty4TcpChannel) ((TcpTransportChannel) inner).getChannel();
+                nettyChannel = (Netty4TcpChannel ) ((TcpTransportChannel) inner).getChannel();
             } else
             if (channel instanceof TcpTransportChannel) {
                 final TcpChannel inner = ((TcpTransportChannel) channel).getChannel();

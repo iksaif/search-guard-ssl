@@ -27,6 +27,8 @@ import io.netty.handler.ssl.SslHandler;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.elasticsearch.common.network.NetworkService;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.util.BigArrays;
@@ -42,6 +44,7 @@ import com.floragunn.searchguard.ssl.SearchGuardKeyStore;
 
 public class SearchGuardSSLNettyHttpServerTransport extends Netty4HttpServerTransport {
 
+    private static final Logger logger = LogManager.getLogger(SearchGuardSSLNettyHttpServerTransport.class);
     private final SearchGuardKeyStore sgks;
     //private final ThreadContext threadContext;
     private final SslExceptionHandler errorHandler;

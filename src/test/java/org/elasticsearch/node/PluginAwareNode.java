@@ -29,5 +29,6 @@ public class PluginAwareNode extends Node {
     @SafeVarargs
     public PluginAwareNode(final Settings preparedSettings, Path configPath, final Class<? extends Plugin>... plugins) {
         super(InternalSettingsPreparer.prepareEnvironment(preparedSettings, Collections.emptyMap(), configPath, () -> System.getenv("HOSTNAME")), Arrays.asList(plugins), true);
+
     }
 }

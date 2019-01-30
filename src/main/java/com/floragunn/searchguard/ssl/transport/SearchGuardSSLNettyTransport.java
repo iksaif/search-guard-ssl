@@ -17,15 +17,6 @@
 
 package com.floragunn.searchguard.ssl.transport;
 
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelOutboundHandlerAdapter;
-import io.netty.channel.ChannelPromise;
-import io.netty.handler.codec.DecoderException;
-import io.netty.handler.ssl.NotSslRecordException;
-import io.netty.handler.ssl.SslHandler;
-
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
@@ -39,27 +30,39 @@ import org.elasticsearch.ExceptionsHelper;
 import org.elasticsearch.Version;
 import org.elasticsearch.cluster.node.DiscoveryNode;
 import org.elasticsearch.common.io.stream.NamedWriteableRegistry;
+import org.elasticsearch.common.network.CloseableChannel;
 import org.elasticsearch.common.network.NetworkService;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.util.BigArrays;
+import org.elasticsearch.common.util.PageCacheRecycler;
 import org.elasticsearch.indices.breaker.CircuitBreakerService;
 import org.elasticsearch.threadpool.ThreadPool;
-import org.elasticsearch.transport.TcpServerChannel;
+import org.elasticsearch.transport.TcpChannel;
 import org.elasticsearch.transport.netty4.Netty4Transport;
 
 import com.floragunn.searchguard.ssl.SearchGuardKeyStore;
 import com.floragunn.searchguard.ssl.SslExceptionHandler;
 import com.floragunn.searchguard.ssl.util.SSLConfigConstants;
 
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelOutboundHandlerAdapter;
+import io.netty.channel.ChannelPromise;
+import io.netty.handler.codec.DecoderException;
+import io.netty.handler.ssl.NotSslRecordException;
+import io.netty.handler.ssl.SslHandler;
+
 public class SearchGuardSSLNettyTransport extends Netty4Transport {
 
+    private static final Logger logger = LogManager.getLogger(SearchGuardSSLNettyTransport.class);
     private final SearchGuardKeyStore sgks;
     private final SslExceptionHandler errorHandler;
 
     public SearchGuardSSLNettyTransport(final Settings settings, final Version version, final ThreadPool threadPool, final NetworkService networkService,
-            final BigArrays bigArrays, final NamedWriteableRegistry namedWriteableRegistry,
+            final PageCacheRecycler pageCacheRecycler, final NamedWriteableRegistry namedWriteableRegistry,
             final CircuitBreakerService circuitBreakerService, final SearchGuardKeyStore sgks, final SslExceptionHandler errorHandler) {
-        super(settings, version, threadPool, networkService, bigArrays, namedWriteableRegistry, circuitBreakerService);
+        super(settings, version, threadPool, networkService, pageCacheRecycler, namedWriteableRegistry, circuitBreakerService);
+
         this.sgks = sgks;
         this.errorHandler = errorHandler;
     }
@@ -68,15 +71,14 @@ public class SearchGuardSSLNettyTransport extends Netty4Transport {
     
     @Override
     protected void onNonChannelException(Exception exception) {
-        // TODO Auto-generated method stub
+        // TODO check onNonChannelException/onServerException
         super.onNonChannelException(exception);
     }
 
 
     @Override
-    protected void onServerException(TcpServerChannel channel, Exception e) {
-        
-        
+    public void onException(TcpChannel channel, Exception e) {
+
         if (lifecycle.started()) {
             
             Throwable cause = e;
@@ -89,29 +91,29 @@ public class SearchGuardSSLNettyTransport extends Netty4Transport {
             
             if(cause instanceof NotSslRecordException) {
                 logger.warn("Someone ({}) speaks transport plaintext instead of ssl, will close the channel", channel.getLocalAddress());
-                channel.close();
+                CloseableChannel.closeChannel(channel, false);
                 return;
             } else if (cause instanceof SSLException) {
                 logger.error("SSL Problem "+cause.getMessage(),cause);
-                channel.close();
+                CloseableChannel.closeChannel(channel, false);
                 return;
             } else if (cause instanceof SSLHandshakeException) {
                 logger.error("Problem during handshake "+cause.getMessage());
-                channel.close();
+                CloseableChannel.closeChannel(channel, false);
                 return;
             }
         }
-        super.onServerException(channel, e);
+        super.onException(channel, e);
     }
 
     @Override
     protected ChannelHandler getServerChannelInitializer(String name) {
         return new SSLServerChannelInitializer(name);
     }
-
+    
     @Override
     protected ChannelHandler getClientChannelInitializer(DiscoveryNode node) {
-        return new SSLClientChannelInitializer();
+        return new SSLClientChannelInitializer(node);
     }
 
     protected class SSLServerChannelInitializer extends Netty4Transport.ServerChannelInitializer {
@@ -234,7 +236,7 @@ public class SearchGuardSSLNettyTransport extends Netty4Transport {
         private final boolean hostnameVerificationEnabled;
         private final boolean hostnameVerificationResovleHostName;
 
-        public SSLClientChannelInitializer() {
+        public SSLClientChannelInitializer(DiscoveryNode node) {
             hostnameVerificationEnabled = settings.getAsBoolean(
                     SSLConfigConstants.SEARCHGUARD_SSL_TRANSPORT_ENFORCE_HOSTNAME_VERIFICATION, true);
             hostnameVerificationResovleHostName = settings.getAsBoolean(

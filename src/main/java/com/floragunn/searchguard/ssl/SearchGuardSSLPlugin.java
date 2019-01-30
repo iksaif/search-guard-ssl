@@ -244,15 +244,16 @@ public class SearchGuardSSLPlugin extends Plugin implements ActionPlugin, Networ
     }
 
     
+    
     @Override
-    public Map<String, Supplier<Transport>> getTransports(Settings settings, ThreadPool threadPool, BigArrays bigArrays,
-            PageCacheRecycler pageCacheRecycler, CircuitBreakerService circuitBreakerService,
-            NamedWriteableRegistry namedWriteableRegistry, NetworkService networkService) {
+    public Map<String, Supplier<Transport>> getTransports(Settings settings, ThreadPool threadPool, PageCacheRecycler pageCacheRecycler,
+            CircuitBreakerService circuitBreakerService, NamedWriteableRegistry namedWriteableRegistry, NetworkService networkService) {
         
         Map<String, Supplier<Transport>> transports = new HashMap<String, Supplier<Transport>>();
         if (transportSSLEnabled) {
-            transports.put("com.floragunn.searchguard.ssl.http.netty.SearchGuardSSLNettyTransport", 
-                    () -> new SearchGuardSSLNettyTransport(settings, Version.CURRENT, threadPool, networkService, bigArrays, namedWriteableRegistry, circuitBreakerService, sgks, NOOP_SSL_EXCEPTION_HANDLER));
+            transports.put("com.floragunn.searchguard.ssl.http.netty.SearchGuardSSLNettyTransport",
+                    () -> new SearchGuardSSLNettyTransport(settings, Version.CURRENT, threadPool, networkService, pageCacheRecycler, namedWriteableRegistry, circuitBreakerService, sgks, NOOP_SSL_EXCEPTION_HANDLER));
+
         }
         return transports;
 
