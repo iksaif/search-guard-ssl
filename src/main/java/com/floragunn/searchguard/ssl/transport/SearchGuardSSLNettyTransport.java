@@ -67,15 +67,6 @@ public class SearchGuardSSLNettyTransport extends Netty4Transport {
         this.errorHandler = errorHandler;
     }
 
-    
-    
-    @Override
-    protected void onNonChannelException(Exception exception) {
-        // TODO check onNonChannelException/onServerException
-        super.onNonChannelException(exception);
-    }
-
-
     @Override
     public void onException(TcpChannel channel, Exception e) {
 
