@@ -242,6 +242,11 @@ public class DefaultSearchGuardKeyStore implements SearchGuardKeyStore {
                 final String keystorePassword = settings.get(
                         SSLConfigConstants.SEARCHGUARD_SSL_TRANSPORT_KEYSTORE_PASSWORD,
                         SSLConfigConstants.DEFAULT_STORE_PASSWORD);
+                
+                final String keyPassword = settings.get(
+                        SSLConfigConstants.SEARCHGUARD_SSL_TRANSPORT_KEYSTORE_KEYPASSWORD,
+                        keystorePassword);
+                
                 final String keystoreAlias = settings.get(SSLConfigConstants.SEARCHGUARD_SSL_TRANSPORT_KEYSTORE_ALIAS,
                         null);
 
@@ -271,8 +276,8 @@ public class DefaultSearchGuardKeyStore implements SearchGuardKeyStore {
                     final X509Certificate[] transportKeystoreCert = SSLCertificateHelper.exportServerCertChain(ks,
                             keystoreAlias);
                     final PrivateKey transportKeystoreKey = SSLCertificateHelper.exportDecryptedKey(ks, keystoreAlias,
-                            (keystorePassword == null || keystorePassword.length() == 0) ? null
-                                    : keystorePassword.toCharArray());
+                            (keyPassword == null || keyPassword.length() == 0) ? null
+                                    : keyPassword.toCharArray());
 
                     if (transportKeystoreKey == null) {
                         throw new ElasticsearchException(
@@ -372,6 +377,12 @@ public class DefaultSearchGuardKeyStore implements SearchGuardKeyStore {
                         DEFAULT_STORE_TYPE);
                 final String keystorePassword = settings.get(SSLConfigConstants.SEARCHGUARD_SSL_HTTP_KEYSTORE_PASSWORD,
                         SSLConfigConstants.DEFAULT_STORE_PASSWORD);
+                
+                final String keyPassword = settings.get(
+                        SSLConfigConstants.SEARCHGUARD_SSL_HTTP_KEYSTORE_KEYPASSWORD,
+                        keystorePassword);
+                
+                
                 final String keystoreAlias = settings.get(SSLConfigConstants.SEARCHGUARD_SSL_HTTP_KEYSTORE_ALIAS, null);
 
                 log.info("HTTPS client auth mode {}", httpClientAuthMode);
@@ -401,8 +412,8 @@ public class DefaultSearchGuardKeyStore implements SearchGuardKeyStore {
                     final X509Certificate[] httpKeystoreCert = SSLCertificateHelper.exportServerCertChain(ks,
                             keystoreAlias);
                     final PrivateKey httpKeystoreKey = SSLCertificateHelper.exportDecryptedKey(ks, keystoreAlias,
-                            (keystorePassword == null || keystorePassword.length() == 0) ? null
-                                    : keystorePassword.toCharArray());
+                            (keyPassword == null || keyPassword.length() == 0) ? null
+                                    : keyPassword.toCharArray());
 
                     if (httpKeystoreKey == null) {
                         throw new ElasticsearchException(
