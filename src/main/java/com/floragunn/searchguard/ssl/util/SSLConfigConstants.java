@@ -36,6 +36,7 @@ public final class SSLConfigConstants {
     public static final String SEARCHGUARD_SSL_HTTP_PEMCERT_FILEPATH = "searchguard.ssl.http.pemcert_filepath";
     public static final String SEARCHGUARD_SSL_HTTP_PEMTRUSTEDCAS_FILEPATH = "searchguard.ssl.http.pemtrustedcas_filepath";
     public static final String SEARCHGUARD_SSL_HTTP_KEYSTORE_PASSWORD = "searchguard.ssl.http.keystore_password";
+    public static final String SEARCHGUARD_SSL_HTTP_KEYSTORE_KEYPASSWORD = "searchguard.ssl.http.keystore_keypassword";
     public static final String SEARCHGUARD_SSL_HTTP_KEYSTORE_TYPE = "searchguard.ssl.http.keystore_type";
     public static final String SEARCHGUARD_SSL_HTTP_TRUSTSTORE_ALIAS = "searchguard.ssl.http.truststore_alias";
     public static final String SEARCHGUARD_SSL_HTTP_TRUSTSTORE_FILEPATH = "searchguard.ssl.http.truststore_filepath";
@@ -53,6 +54,7 @@ public final class SSLConfigConstants {
     public static final String SEARCHGUARD_SSL_TRANSPORT_PEMCERT_FILEPATH = "searchguard.ssl.transport.pemcert_filepath";
     public static final String SEARCHGUARD_SSL_TRANSPORT_PEMTRUSTEDCAS_FILEPATH = "searchguard.ssl.transport.pemtrustedcas_filepath";
     public static final String SEARCHGUARD_SSL_TRANSPORT_KEYSTORE_PASSWORD = "searchguard.ssl.transport.keystore_password";
+    public static final String SEARCHGUARD_SSL_TRANSPORT_KEYSTORE_KEYPASSWORD = "searchguard.ssl.transport.keystore_keypassword";
     public static final String SEARCHGUARD_SSL_TRANSPORT_KEYSTORE_TYPE = "searchguard.ssl.transport.keystore_type";
     public static final String SEARCHGUARD_SSL_TRANSPORT_TRUSTSTORE_ALIAS = "searchguard.ssl.transport.truststore_alias";
     public static final String SEARCHGUARD_SSL_TRANSPORT_TRUSTSTORE_FILEPATH = "searchguard.ssl.transport.truststore_filepath";

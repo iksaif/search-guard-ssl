@@ -164,4 +164,10 @@ public class OpenSSLTest extends SSLTest {
         Assume.assumeTrue(OpenSsl.isAvailable());
         super.testHttpsAndNodeSSLPemEnc();
     }
+    
+    @Test
+    public void testTLSv1() throws Exception {
+        Assume.assumeTrue(OpenSsl.isAvailable());
+        super.testTLSv1();
+    }
 }

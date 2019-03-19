@@ -93,7 +93,7 @@ public class SSLTest extends AbstractUnitTest {
                 .build();
 
         startES(settings);
-
+        
         System.out.println(executeSimpleRequest("_searchguard/sslinfo?pretty&show_dn=true"));
         Assert.assertTrue(executeSimpleRequest("_searchguard/sslinfo?pretty&show_dn=true").contains("EMAILADDRESS=unt@tst.com"));
         Assert.assertTrue(executeSimpleRequest("_searchguard/sslinfo?pretty&show_dn=true").contains("local_certificates_list"));
@@ -794,5 +794,101 @@ public class SSLTest extends AbstractUnitTest {
         Assert.assertFalse(executeSimpleRequest("_nodes/stats?pretty").contains("\"rx_count\" : 0"));
         Assert.assertFalse(executeSimpleRequest("_nodes/stats?pretty").contains("\"rx_size_in_bytes\" : 0"));
         Assert.assertFalse(executeSimpleRequest("_nodes/stats?pretty").contains("\"tx_count\" : 0"));
+    }
+    
+    @Test
+    public void testTLSv1() throws Exception {
+        
+        enableHTTPClientSSL = true;
+        trustHTTPServerCertificate = true;
+
+        final Settings settings = Settings.builder().put("searchguard.ssl.transport.enabled", true)
+                .put(SSLConfigConstants.SEARCHGUARD_SSL_HTTP_ENABLE_OPENSSL_IF_AVAILABLE, allowOpenSSL)
+                .put(SSLConfigConstants.SEARCHGUARD_SSL_TRANSPORT_ENABLE_OPENSSL_IF_AVAILABLE, allowOpenSSL)
+                .put(SSLConfigConstants.SEARCHGUARD_SSL_TRANSPORT_KEYSTORE_ALIAS, "node-0")
+                .put("searchguard.ssl.transport.keystore_filepath", getAbsoluteFilePathFromClassPath("node-0-keystore.jks"))
+                .put("searchguard.ssl.transport.truststore_filepath", getAbsoluteFilePathFromClassPath("truststore.jks"))
+                .put("searchguard.ssl.http.keystore_filepath", getAbsoluteFilePathFromClassPath("node-0-keystore.jks"))
+                .put("searchguard.ssl.http.truststore_filepath", getAbsoluteFilePathFromClassPath("truststore.jks"))
+                .put("searchguard.ssl.transport.enforce_hostname_verification", false)
+                .put("searchguard.ssl.transport.resolve_hostname", false)
+                .put(SSLConfigConstants.SEARCHGUARD_SSL_HTTP_ENABLED_PROTOCOLS, "TLSv1")
+                .put(SSLConfigConstants.SEARCHGUARD_SSL_HTTP_ENABLED, true)
+                .build();
+
+        startES(settings);
+
+        Assert.assertTrue(executeSimpleRequest("_nodes/stats?pretty").contains("\"tx_size_in_bytes\""));
+    }
+
+    
+    @Test
+    public void testHttpsAndNodeSSLKeyPass() throws Exception {
+
+        enableHTTPClientSSL = true;
+        trustHTTPServerCertificate = true;
+        sendHTTPClientCertificate = true;
+
+        final Settings settings = Settings.builder().put("searchguard.ssl.transport.enabled", true)
+                .put(SSLConfigConstants.SEARCHGUARD_SSL_HTTP_ENABLE_OPENSSL_IF_AVAILABLE, allowOpenSSL)
+                .put(SSLConfigConstants.SEARCHGUARD_SSL_TRANSPORT_ENABLE_OPENSSL_IF_AVAILABLE, allowOpenSSL)
+                .put(SSLConfigConstants.SEARCHGUARD_SSL_TRANSPORT_KEYSTORE_ALIAS, "node-0")
+                .put(SSLConfigConstants.SEARCHGUARD_SSL_HTTP_KEYSTORE_ALIAS, "node-0")
+                .put("searchguard.ssl.transport.keystore_filepath", getAbsoluteFilePathFromClassPath("node-0-keystore.jks"))
+                .put("searchguard.ssl.transport.truststore_filepath", getAbsoluteFilePathFromClassPath("truststore.jks"))
+                .put(SSLConfigConstants.SEARCHGUARD_SSL_TRANSPORT_KEYSTORE_KEYPASSWORD, "changeit")
+                .put("searchguard.ssl.transport.enforce_hostname_verification", false)
+                .put("searchguard.ssl.transport.resolve_hostname", false)
+
+                .put("searchguard.ssl.http.enabled", true).put("searchguard.ssl.http.clientauth_mode", "REQUIRE")
+                .put("searchguard.ssl.http.keystore_filepath", getAbsoluteFilePathFromClassPath("node-0-keystore.jks"))
+                .put("searchguard.ssl.http.truststore_filepath", getAbsoluteFilePathFromClassPath("truststore.jks"))
+                .put(SSLConfigConstants.SEARCHGUARD_SSL_HTTP_KEYSTORE_KEYPASSWORD, "changeit")
+
+                
+                .build();
+
+        startES(settings);
+        System.out.println(executeSimpleRequest("_searchguard/sslinfo?pretty"));
+        Assert.assertTrue(executeSimpleRequest("_searchguard/sslinfo?pretty").contains("TLS"));
+        Assert.assertTrue(executeSimpleRequest("_searchguard/sslinfo?pretty").length() > 0);
+        Assert.assertTrue(executeSimpleRequest("_nodes/settings?pretty").contains(clustername));
+        Assert.assertTrue(executeSimpleRequest("_searchguard/sslinfo?pretty").contains("CN=node-0.example.com,OU=SSL,O=Test,L=Test,C=DE"));
+        Assert.assertFalse(executeSimpleRequest("_nodes/stats?pretty").contains("\"tx_size_in_bytes\" : 0"));
+        Assert.assertFalse(executeSimpleRequest("_nodes/stats?pretty").contains("\"rx_count\" : 0"));
+        Assert.assertFalse(executeSimpleRequest("_nodes/stats?pretty").contains("\"rx_size_in_bytes\" : 0"));
+        Assert.assertFalse(executeSimpleRequest("_nodes/stats?pretty").contains("\"tx_count\" : 0"));
+    
+    }
+    
+    @Test(expected=IllegalStateException.class)
+    public void testHttpsAndNodeSSLKeyPassFail() throws Exception {
+
+        enableHTTPClientSSL = true;
+        trustHTTPServerCertificate = true;
+        sendHTTPClientCertificate = true;
+
+        final Settings settings = Settings.builder().put("searchguard.ssl.transport.enabled", true)
+                .put(SSLConfigConstants.SEARCHGUARD_SSL_HTTP_ENABLE_OPENSSL_IF_AVAILABLE, allowOpenSSL)
+                .put(SSLConfigConstants.SEARCHGUARD_SSL_TRANSPORT_ENABLE_OPENSSL_IF_AVAILABLE, allowOpenSSL)
+                .put(SSLConfigConstants.SEARCHGUARD_SSL_TRANSPORT_KEYSTORE_ALIAS, "node-0")
+                .put(SSLConfigConstants.SEARCHGUARD_SSL_HTTP_KEYSTORE_ALIAS, "node-0")
+                .put("searchguard.ssl.transport.keystore_filepath", getAbsoluteFilePathFromClassPath("node-0-keystore.jks"))
+                .put("searchguard.ssl.transport.truststore_filepath", getAbsoluteFilePathFromClassPath("truststore.jks"))
+                .put(SSLConfigConstants.SEARCHGUARD_SSL_TRANSPORT_KEYSTORE_KEYPASSWORD, "wrongpass")
+                .put("searchguard.ssl.transport.enforce_hostname_verification", false)
+                .put("searchguard.ssl.transport.resolve_hostname", false)
+
+                .put("searchguard.ssl.http.enabled", true).put("searchguard.ssl.http.clientauth_mode", "REQUIRE")
+                .put("searchguard.ssl.http.keystore_filepath", getAbsoluteFilePathFromClassPath("node-0-keystore.jks"))
+                .put("searchguard.ssl.http.truststore_filepath", getAbsoluteFilePathFromClassPath("truststore.jks"))
+                .put(SSLConfigConstants.SEARCHGUARD_SSL_HTTP_KEYSTORE_KEYPASSWORD, "wrongpass")
+
+                
+                .build();
+
+        startES(settings);
+        Assert.assertTrue(executeSimpleRequest("_searchguard/sslinfo?pretty").contains("TLS"));
+    
     }
 }
