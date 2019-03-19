@@ -116,7 +116,7 @@ public class SSLCertificateHelper {
         return new X509Certificate[0];
     }
 
-    public static PrivateKey exportDecryptedKey(final KeyStore ks, final String alias, final char[] password) throws KeyStoreException, UnrecoverableKeyException, NoSuchAlgorithmException {
+    public static PrivateKey exportDecryptedKey(final KeyStore ks, final String alias, final char[] keyPassword) throws KeyStoreException, UnrecoverableKeyException, NoSuchAlgorithmException {
         logKeyStore(ks);
         final List<String> aliases = toList(ks.aliases());
 
@@ -130,7 +130,7 @@ public class SSLCertificateHelper {
             throw new KeyStoreException("null alias, current aliases: " + aliases);
         }
 
-        final Key key = ks.getKey(evaluatedAlias, (password == null || password.length == 0) ? null:password);
+        final Key key = ks.getKey(evaluatedAlias, (keyPassword == null || keyPassword.length == 0) ? null:keyPassword);
 
         if (key == null) {
             throw new KeyStoreException("no key alias named " + evaluatedAlias);

@@ -4,9 +4,7 @@ jobs:
     working_directory: ~/circleci-sg
     resource_class: xlarge
     docker:
-      # Java 11 does currently crash, hopefully solved with GA release
-      # So for now we default to Java 10
-      - image: "circleci/openjdk:${SG_JAVA_BUILD_VERSION:-10}-jdk-browsers"
+      - image: "circleci/openjdk:${SG_JAVA_BUILD_VERSION:-11}-jdk-browsers"
     steps:
       - run:
           name: Install and Update
@@ -21,7 +19,7 @@ jobs:
             - maven-repo-v3-{{ .Branch }}-
             - maven-repo-v3-
       #- run: ./smoketest.sh
-      - run: SG_TEST_OPENSSL_OPT=true mvn -U -Pcoverage verify
+      - run: mvn -U -Pcoverage,with-static-openssl-linux-non-fedora,-with-dynamic-openssl verify
       - store_test_results:
           path: target/surefire-reports
       - deploy:
@@ -30,10 +28,8 @@ jobs:
             
             mvn deploy -U -DskipTests -s settings.xml
             
-            set +e
-            
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              SG_TEST_OPENSSL_OPT=true mvn -U -Pcoverage sonar:sonar -Dsonar.organization=floragunncom-github -Dsonar.login=$SONAR_LOGIN -Dsonar.host.url=https://sonarcloud.io
+              mvn -U -Pcoverage,with-static-openssl-linux-non-fedora,-with-dynamic-openssl sonar:sonar -Dsonar.organization=floragunncom-github -Dsonar.login=$SONAR_LOGIN -Dsonar.host.url=https://sonarcloud.io
             fi
       - save_cache:
           paths:

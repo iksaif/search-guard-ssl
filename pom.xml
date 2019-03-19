@@ -9,14 +9,15 @@
   implied. ~ See the Apache License Version 2.0 for the specific language governing 
   permissions and limitations there under. -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>com.floragunn</groupId>
     <artifactId>search-guard-parent</artifactId>
-    <version>6.22.0</version>
+    <version>6.22.1</version>
   </parent>
 
   <artifactId>search-guard-ssl</artifactId>
@@ -37,10 +38,10 @@
   </licenses>
 
   <properties>
-    <elasticsearch.version>6.4.0</elasticsearch.version>
+    <elasticsearch.version>6.5.1</elasticsearch.version>
 
     <!-- deps -->
-    <netty-native.version>2.0.7.Final</netty-native.version>
+    <netty-native.version>2.0.15.Final</netty-native.version>
     <log4j.version>2.11.1</log4j.version>
   </properties>
 
@@ -63,14 +64,6 @@
       <groupId>org.elasticsearch</groupId>
       <artifactId>elasticsearch</artifactId>
       <version>${elasticsearch.version}</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>io.netty</groupId>
-      <artifactId>netty-tcnative</artifactId>
-      <version>${netty-native.version}</version>
-      <classifier>${os.detected.classifier}</classifier>
       <scope>provided</scope>
     </dependency>
 
@@ -147,4 +140,44 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>with-static-openssl-linux-non-fedora</id>
+      <dependencies>
+        <dependency>
+          <groupId>com.floragunn</groupId>
+          <artifactId>search-guard-static-tcnative-beta</artifactId>
+          <version>1.1.0j-${netty-native.version}-non-fedora-linux-x86_64</version>
+          <scope>provided</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>with-static-openssl-linux-fedora</id>
+      <dependencies>
+        <dependency>
+          <groupId>com.floragunn</groupId>
+          <artifactId>search-guard-static-tcnative-beta</artifactId>
+          <version>1.1.0j-${netty-native.version}-fedora-linux-x86_64</version>
+          <scope>provided</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>with-dynamic-openssl</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>io.netty</groupId>
+          <artifactId>netty-tcnative</artifactId>
+          <version>${netty-native.version}</version>
+          <classifier>${os.detected.classifier}</classifier>
+          <scope>provided</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
 </project>
