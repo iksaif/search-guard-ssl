@@ -17,15 +17,6 @@
 
 package com.floragunn.searchguard.ssl.transport;
 
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelOutboundHandlerAdapter;
-import io.netty.channel.ChannelPromise;
-import io.netty.handler.codec.DecoderException;
-import io.netty.handler.ssl.NotSslRecordException;
-import io.netty.handler.ssl.SslHandler;
-
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
@@ -36,7 +27,6 @@ import javax.net.ssl.SSLHandshakeException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.ExceptionsHelper;
-import org.elasticsearch.cluster.node.DiscoveryNode;
 import org.elasticsearch.common.io.stream.NamedWriteableRegistry;
 import org.elasticsearch.common.network.NetworkService;
 import org.elasticsearch.common.settings.Settings;
@@ -46,9 +36,18 @@ import org.elasticsearch.threadpool.ThreadPool;
 import org.elasticsearch.transport.TcpChannel;
 import org.elasticsearch.transport.netty4.Netty4Transport;
 
-import com.floragunn.searchguard.ssl.SslExceptionHandler;
 import com.floragunn.searchguard.ssl.SearchGuardKeyStore;
+import com.floragunn.searchguard.ssl.SslExceptionHandler;
 import com.floragunn.searchguard.ssl.util.SSLConfigConstants;
+
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelOutboundHandlerAdapter;
+import io.netty.channel.ChannelPromise;
+import io.netty.handler.codec.DecoderException;
+import io.netty.handler.ssl.NotSslRecordException;
+import io.netty.handler.ssl.SslHandler;
 
 public class SearchGuardSSLNettyTransport extends Netty4Transport {
 
@@ -100,8 +99,8 @@ public class SearchGuardSSLNettyTransport extends Netty4Transport {
     }
     
     @Override
-    protected ChannelHandler getClientChannelInitializer(DiscoveryNode node) {
-        return new SSLClientChannelInitializer(node);
+    protected ChannelHandler getClientChannelInitializer() {
+        return new SSLClientChannelInitializer();
     }
 
     protected class SSLServerChannelInitializer extends Netty4Transport.ServerChannelInitializer {
@@ -224,7 +223,7 @@ public class SearchGuardSSLNettyTransport extends Netty4Transport {
         private final boolean hostnameVerificationEnabled;
         private final boolean hostnameVerificationResovleHostName;
 
-        public SSLClientChannelInitializer(DiscoveryNode node) {
+        public SSLClientChannelInitializer() {
             hostnameVerificationEnabled = settings.getAsBoolean(
                     SSLConfigConstants.SEARCHGUARD_SSL_TRANSPORT_ENFORCE_HOSTNAME_VERIFICATION, true);
             hostnameVerificationResovleHostName = settings.getAsBoolean(
