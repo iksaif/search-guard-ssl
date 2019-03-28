@@ -209,4 +209,10 @@ public class OpenSSLTest extends SSLTest {
         Assert.assertFalse(executeSimpleRequest("_nodes/stats?pretty").contains("\"rx_size_in_bytes\" : 0"));
         Assert.assertFalse(executeSimpleRequest("_nodes/stats?pretty").contains("\"tx_count\" : 0"));
     }
+
+    @Test
+    public void testTLSv1() throws Exception {
+        Assume.assumeTrue(OpenSsl.isAvailable());
+        super.testTLSv1();
+    }
 }
