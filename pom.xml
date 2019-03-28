@@ -38,22 +38,12 @@
   </licenses>
 
   <properties>
-    <elasticsearch.version>7.0.0-beta1</elasticsearch.version>
+    <elasticsearch.version>7.0.0-rc1</elasticsearch.version>
 
     <!-- deps -->
     <netty-native.version>2.0.20.Final</netty-native.version>
     <log4j.version>2.11.1</log4j.version>
   </properties>
-  
-  <repositories>
-    <repository>
-      <id>elastic-lucene-snapshots</id>
-      <name>Elastic Lucene Snapshots</name>
-      <url>http://s3.amazonaws.com/download.elasticsearch.org/lucenesnapshots/83f9835</url>
-      <releases><enabled>true</enabled></releases>
-      <snapshots><enabled>false</enabled></snapshots>
-    </repository>
-  </repositories>
 
   <scm>
     <url>https://github.com/floragunncom/search-guard-ssl</url>
