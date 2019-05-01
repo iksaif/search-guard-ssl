@@ -4,6 +4,9 @@
 
 Search Guard SSL is a free and Open Source plugin for Elasticsearch which provides SSL/TLS for Elasticsearch. It supports OpenSSL for maximum performance and security. It does not provide authentication and authorization. For that please refer to [Search Guard](https://github.com/floragunncom/search-guard), our complete Elasticsearch security suite.
 
+## Elasticsearch 7 and above
+
+Since Search Guard 7 the code of this repository was merged into the [main Search Guard repository](https://github.com/floragunncom/search-guard/).
 
 ## Features
 * Node-to-node encryption through SSL/TLS (Transport layer)
