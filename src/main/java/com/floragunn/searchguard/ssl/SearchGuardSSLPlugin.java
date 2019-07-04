@@ -81,7 +81,7 @@ import com.floragunn.searchguard.ssl.util.SSLConfigConstants;
 //For ES5 this class has only effect when SSL only plugin is installed
 public class SearchGuardSSLPlugin extends Plugin implements ActionPlugin, NetworkPlugin {
 
-    protected final Logger log = LogManager.getLogger(this.getClass());
+    protected static final Logger log = LogManager.getLogger(this.getClass());
     protected static final String CLIENT_TYPE = "client.type";
     protected final boolean client;
     protected final boolean httpSSLEnabled;
